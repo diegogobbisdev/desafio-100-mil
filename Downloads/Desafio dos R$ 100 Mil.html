@@ -1,0 +1,169 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Desafio dos R$ 100 Mil</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: cofrinho de quadrinhos — grade de cédulas por etapa, placar fixo no rodapé */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#17221c; --muted:#5d6b63; --line:#d9e0db;
+  --cash:#1f9d55; --cash-ink:#ffffff; --cash-soft:#e3f4ea; --danger:#c2410c;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1512; --surface:#18201b; --ink:#e7eee9; --muted:#93a39a; --line:#2a352f;
+  --cash:#2fbf6b; --cash-ink:#06210f; --cash-soft:#163323; --danger:#fb923c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1512; --surface:#18201b; --ink:#e7eee9; --muted:#93a39a; --line:#2a352f;
+  --cash:#2fbf6b; --cash-ink:#06210f; --cash-soft:#163323; --danger:#fb923c; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:960px;margin:0 auto;padding-block:28px 0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,6vw,44px);line-height:1.05;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--cash)}
+.lead{color:var(--muted);margin:8px 0 0;max-width:60ch}
+section{margin-top:28px}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+h2{font-family:var(--display);font-weight:600;font-size:19px;margin:0}
+.count{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:5px}
+.grid.extras{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+.cell{font:600 14px/1 var(--body);font-variant-numeric:tabular-nums;height:40px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);border-radius:6px;cursor:pointer;transition:background .12s,transform .08s}
+.cell:hover{border-color:var(--cash)}
+.cell:active{transform:scale(.94)}
+.cell:focus-visible{outline:2px solid var(--cash);outline-offset:2px}
+.cell[aria-pressed="true"]{background:var(--cash);border-color:var(--cash);color:var(--cash-ink)}
+.extras .cell{font-size:15px}
+.tip{color:var(--muted);font-size:13px;margin-top:20px}
+.reset{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:16px 0 24px}
+.btn{font:500 13px var(--body);padding:8px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.warn{border-color:var(--danger);color:var(--danger)}
+.bar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar-in{max-width:960px;margin:0 auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stat span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.stat b{font-family:var(--display);font-weight:800;font-size:clamp(16px,4.2vw,24px);font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat.dep b{color:var(--cash)}
+.track{height:8px;background:var(--cash-soft);border-radius:99px;margin-top:10px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--cash);transition:width .25s}
+.meta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){.cell,.fill{transition:none}}
+</style>
+
+<div class="wrap">
+  <h1>Desafio dos <em>R$ 100 mil</em></h1>
+  <p class="lead">632 depósitos. Toque no valor depois de guardar o dinheiro e ele fica verde. Tocou errado? Toque de novo para desmarcar.</p>
+
+  <section>
+    <div class="head"><h2>1ª etapa · de 1 a 315</h2><span class="count" id="c-a"></span></div>
+    <div class="grid" id="g-a"></div>
+  </section>
+  <section>
+    <div class="head"><h2>2ª etapa · de 315 a 1</h2><span class="count" id="c-b"></span></div>
+    <div class="grid" id="g-b"></div>
+  </section>
+  <section>
+    <div class="head"><h2>Depósitos extras</h2><span class="count" id="c-x"></span></div>
+    <div class="grid extras" id="g-x"></div>
+  </section>
+
+  <p class="tip" id="sync">Carregando seu progresso…</p>
+  <div class="reset">
+    <button class="btn" id="reset" type="button">Zerar tabela</button>
+    <span id="confirm" hidden>
+      <button class="btn warn" id="yes" type="button">Sim, desmarcar tudo</button>
+      <button class="btn" id="no" type="button">Cancelar</button>
+    </span>
+  </div>
+</div>
+
+<div class="bar"><div class="bar-in">
+  <div class="stats">
+    <div class="stat dep"><span>Depositado</span><b id="s-dep">R$ 0,00</b></div>
+    <div class="stat"><span>Falta</span><b id="s-falta">R$ 0,00</b></div>
+    <div class="stat"><span>Total</span><b id="s-total">R$ 0,00</b></div>
+  </div>
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="meta"><span id="m-pct">0%</span><span id="m-n">0 de 632 depósitos</span><span>Meta: R$ 100.000,00</span></div>
+</div></div>
+
+<script>
+const KEY = "desafio100mil";
+const items = [];
+for (let v = 1; v <= 315; v++) items.push({ id: "a" + v, v, g: "a" });
+for (let v = 315; v >= 1; v--) items.push({ id: "b" + v, v, g: "b" });
+items.push({ id: "x1", v: 256, g: "x" }, { id: "x2", v: 256, g: "x" });
+const TOTAL = items.reduce((s, i) => s + i.v, 0); // 100.052
+
+let done = new Set();
+try { done = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch {}
+
+const brl = n => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const $ = id => document.getElementById(id);
+const btns = {};
+
+for (const it of items) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "cell"; b.id = "cell-" + it.id;
+  b.textContent = it.g === "x" ? brl(it.v) : it.v;
+  b.setAttribute("aria-label", "Depósito de " + brl(it.v));
+  b.onclick = () => { done.has(it.id) ? done.delete(it.id) : done.add(it.id); render(); save(); };
+  btns[it.id] = b;
+  $("g-" + it.g).append(b);
+}
+
+function render() {
+  let dep = 0; const n = { a: 0, b: 0, x: 0 };
+  for (const it of items) {
+    const on = done.has(it.id);
+    btns[it.id].setAttribute("aria-pressed", on);
+    if (on) { dep += it.v; n[it.g]++; }
+  }
+  $("c-a").textContent = n.a + " de 315";
+  $("c-b").textContent = n.b + " de 315";
+  $("c-x").textContent = n.x + " de 2";
+  $("s-dep").textContent = brl(dep);
+  $("s-falta").textContent = brl(TOTAL - dep);
+  $("s-total").textContent = brl(TOTAL);
+  const pct = dep / TOTAL * 100;
+  $("fill").style.width = pct + "%";
+  $("m-pct").textContent = pct.toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "% concluído";
+  $("m-n").textContent = done.size + " de 632 depósitos";
+}
+
+// Salva no navegador na hora e na sua conta (quando disponível) com um pequeno atraso
+let ref = null, timer = null;
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify([...done])); } catch {}
+  if (!ref) return;
+  clearTimeout(timer);
+  timer = setTimeout(() => ref.set({ done: [...done], at: Date.now() })
+    .then(() => $("sync").textContent = "Progresso salvo na sua conta.")
+    .catch(() => $("sync").textContent = "Não consegui salvar na conta agora; ficou salvo neste navegador."), 600);
+}
+
+$("reset").onclick = () => { $("confirm").hidden = false; $("reset").hidden = true; };
+$("no").onclick = () => { $("confirm").hidden = true; $("reset").hidden = false; };
+$("yes").onclick = () => { done.clear(); render(); save(); $("no").onclick(); };
+
+render();
+
+(async () => {
+  const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]).catch(() => [null, null]);
+  const uid = user && await user.id();
+  if (!db || !uid) { $("sync").textContent = "Seu progresso fica salvo neste navegador."; return; }
+  ref = db.doc("data/users/" + uid + "/progresso");
+  try {
+    const snap = await ref.get();
+    if (snap.exists) { done = new Set(snap.data().done || []); render(); try { localStorage.setItem(KEY, JSON.stringify([...done])); } catch {} }
+    else if (done.size) save(); // primeira vez: sobe o que já estava marcado neste navegador
+    $("sync").textContent = "Progresso salvo na sua conta, aparece em qualquer aparelho.";
+  } catch { ref = null; $("sync").textContent = "Seu progresso fica salvo neste navegador."; }
+})();
+</script>
+
+</body></html>
